@@ -57,6 +57,21 @@ job "example" {
 			# Configure Docker driver with the image
 			config {
 				image = "redis:latest"
+				port_map {
+					db = 6379
+				}
+			}
+
+			service "id-redis-check" {
+				# name = redis
+				tags = ["global", "cache"]
+				port = "db"
+				check "id-alive-check" {
+					name = "alive"
+					type = "tcp"
+					interval = "10s"
+					timeout = "2s"
+				}
 			}
 
 			# We must specify the resources required for
@@ -67,7 +82,8 @@ job "example" {
 				memory = 256 # 256MB
 				network {
 					mbits = 10
-					dynamic_ports = ["6379"]
+					port "db" {
+					}
 				}
 			}
 		}
